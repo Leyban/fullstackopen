@@ -22,7 +22,7 @@ const App = () => {
   const handleNext = () =>{
     let randomNum=0;
     const randomize = () => randomNum = Math.floor(Math.random()*anecdotes.length);
-    if (randomNum===selected){randomize()}
+    while(randomNum===selected){randomize()}
     return setSelected(randomNum);
   }
 
