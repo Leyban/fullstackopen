@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import Filter from './components/Filter'
 import Form from './components/Form'
 import Numbers from './components/Numbers'
-import axios from 'axios'
 import personsServices from './services/persons'
+import Notification from './components/Notification'
+import ErrorAlert from './components/ErrorAlert'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -22,6 +23,9 @@ const App = () => {
   const [filtered, setFiltered] = useState(false)
   const [nameFilter, setNameFilter] = useState('')
   const [filteredPersons, setFilteredPersons] = useState([])
+
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   const handleFilter = (event) => {
     setNameFilter(event.target.value);
@@ -53,6 +57,17 @@ const App = () => {
                 setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
                 setNewName('');
                 setNewNumber('');
+                setNotificationMessage(`Updated ${returnedPerson.name}'s number`)
+                setTimeout(()=>{
+                  setNotificationMessage(null)
+                }, 5000)
+              })
+              .catch(err=>{
+                setErrorMessage(`Information for ${person.name} has been deleted from the server`)
+                setTimeout(()=>{
+                  setErrorMessage(null)
+                }, 5000)
+                setPersons(persons.filter(p => p.id!==person.id))
               })
           }
         }
@@ -73,14 +88,32 @@ const App = () => {
         setPersons(persons.concat(returnedPerson));
         setNewName('');
         setNewNumber('');
+        setNotificationMessage(`Added ${returnedPerson.name}`)
+        setTimeout(()=>{
+          setNotificationMessage(null)
+        }, 5000)
       })
+
   }
 
   const handleDelete = (id, name) => {
     if (window.confirm(`Delete ${name}?`)){
       personsServices
         .deletePerson(id)
-        .then(response => setPersons(persons.filter(p=>p.id!==id)))
+        .then(response => {
+          setPersons(persons.filter(p=>p.id!==id))
+          setNotificationMessage(`${name} was deleted`)
+          setTimeout(()=>{
+            setNotificationMessage(null)
+          }, 5000)
+        })
+        .catch(err=>{
+          setErrorMessage(`Information for ${name} has already been deleted from the server`)
+          setTimeout(()=>{
+            setErrorMessage(null)
+          }, 5000)
+          setPersons(persons.filter(p => p.id!==id))
+        })
     }
   }
 
@@ -95,6 +128,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} />
+      <ErrorAlert message={errorMessage} />
       <Filter nameFilter={nameFilter} handleFilter={handleFilter} />
       <h3>add a new</h3>
       <Form 
