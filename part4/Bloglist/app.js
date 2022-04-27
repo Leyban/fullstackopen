@@ -21,11 +21,6 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(middleware.requestLogger)
 
-app.get('/test', (request,response) => {
-    console.log('this works');
-    response.send("this works").end()
-})
-
 app.use('/api/blogs', blogRouter)
 
 app.use(middleware.unknownEndpoint)

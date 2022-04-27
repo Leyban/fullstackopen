@@ -43,7 +43,6 @@ const mostLikes = (blogs) => {
     const blogsCopy = [...blogs]
     const authors = _.union(blogsCopy.map(blog => blog.author))
 
-    console.log(authors)
     const authorCount = authors.map(author => {
         let totalLikes = 0;
         blogsCopy
@@ -55,7 +54,6 @@ const mostLikes = (blogs) => {
             likes: totalLikes
         }
     })
-    console.log(authorCount)
     return _.maxBy(authorCount, 'likes')
 }
 
