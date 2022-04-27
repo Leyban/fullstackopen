@@ -102,13 +102,15 @@ test('edit blog post', async () => {
     const newBlog = {
         title:'This is an Edited Blog',
         author:'None other than yours truly',
-        url:'http://notarealwebsite.com/'
+        url:'http://notarealwebsite.com/',
+        likes:3
     }
     const returnedBlog = await api.put(`/api/blogs/${idToUpdate}`).send(newBlog)
     expect(returnedBlog.body.id).toBe(idToUpdate)
     expect(returnedBlog.body.title).toBe('This is an Edited Blog')
     expect(returnedBlog.body.author).toBe('None other than yours truly')
     expect(returnedBlog.body.url).toBe('http://notarealwebsite.com/')
+    expect(returnedBlog.body.likes).toBe(3)
 
     const newBloglist = await api.get('/api/blogs')
     expect(newBloglist.body.find(blog=>blog.id===idToUpdate).title)
