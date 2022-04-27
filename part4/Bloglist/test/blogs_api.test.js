@@ -44,7 +44,7 @@ test('can make a post', async () => {
 
     const response = await api.get('/api/blogs')
     expect(response.body).toHaveLength(helper.initialblogs.length + 1)
-    expect(response.body.find(blog=>blog.title==="Making tests is a bore")).toBeDefined()
+    expect(response.body.find(blog => blog.title === "Making tests is a bore")).toBeDefined()
 })
 
 test('default like is 0', async () => {
@@ -56,7 +56,7 @@ test('default like is 0', async () => {
     await newBlog.save()
 
     const response = await api.get('/api/blogs')
-    expect(response.body.find(blog=>blog.title==="Making tests is a bore").likes).toBe(0)
+    expect(response.body.find(blog => blog.title === "Making tests is a bore").likes).toBe(0)
 })
 
 test('reject missing title', async () => {
@@ -72,6 +72,7 @@ test('reject missing title', async () => {
     const response = await api.get('/api/blogs')
     expect(response.body).toHaveLength(helper.initialblogs.length)
 })
+
 test('reject missing url', async () => {
     const urlLessBlog = new Blog({
         title: "Making tests is a bore",
@@ -84,4 +85,36 @@ test('reject missing url', async () => {
 
     const response = await api.get('/api/blogs')
     expect(response.body).toHaveLength(helper.initialblogs.length)
+})
+
+test('delete blog', async () => {
+    const response = await api.get('/api/blogs')
+    const idToDelete = response.body[0].id
+    await api.delete(`/api/blogs/${idToDelete}`)
+
+    const newResponse = await api.get('/api/blogs')
+    expect(newResponse.body).toHaveLength(helper.initialblogs.length - 1)
+})
+
+test('edit blog post', async () => {
+    const response = await api.get('/api/blogs')
+    const idToUpdate = response.body[0].id
+    const newBlog = {
+        title:'This is an Edited Blog',
+        author:'None other than yours truly',
+        url:'http://notarealwebsite.com/'
+    }
+    const returnedBlog = await api.put(`/api/blogs/${idToUpdate}`).send(newBlog)
+    expect(returnedBlog.body.id).toBe(idToUpdate)
+    expect(returnedBlog.body.title).toBe('This is an Edited Blog')
+    expect(returnedBlog.body.author).toBe('None other than yours truly')
+    expect(returnedBlog.body.url).toBe('http://notarealwebsite.com/')
+
+    const newBloglist = await api.get('/api/blogs')
+    expect(newBloglist.body.find(blog=>blog.id===idToUpdate).title)
+        .toBe('This is an Edited Blog')
+})
+
+afterAll(() => {
+    mongoose.connection.close()
 })
