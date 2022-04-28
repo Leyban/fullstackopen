@@ -2,13 +2,24 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./test_helper')
+const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
 
+const getToken = () => {
+    return jwt.sign( {username:"jojo", id:"6269f5bd3f78cd2905140e04"}, process.env.SECRET)
+} 
+
 beforeEach(async () => {
+    await User.deleteMany({})
     await Blog.deleteMany({})
 
+    for (let user of helper.initialUsers) {
+        const userObject = new User(user)
+        await userObject.save()
+    }
     for (let blog of helper.initialblogs) {
         const blogObject = new Blog(blog)
         await blogObject.save()
@@ -21,7 +32,6 @@ test('response is in json', async () => {
         .expect(200)
         .expect('content-type', /application\/json/)
 })
-
 
 test('all initial blogs are saved in the db', async () => {
     const response = await api.get('/api/blogs')
@@ -64,9 +74,11 @@ test('reject missing title', async () => {
         author: "Leyban Lazada",
         url: "http://leybaniskiool.com/"
     })
+    const token = getToken()
     await api
         .post('/api/blogs')
         .send(titleLessBlog)
+        .auth(token, {type:'bearer'} ) 
         .expect(400)
 
     const response = await api.get('/api/blogs')
@@ -78,9 +90,11 @@ test('reject missing url', async () => {
         title: "Making tests is a bore",
         author: "Leyban Lazada",
     })
+    const token = getToken()
     await api
         .post('/api/blogs')
         .send(urlLessBlog)
+        .auth(token, {type:'bearer'} ) 
         .expect(400)
 
     const response = await api.get('/api/blogs')
@@ -90,7 +104,10 @@ test('reject missing url', async () => {
 test('delete blog', async () => {
     const response = await api.get('/api/blogs')
     const idToDelete = response.body[0].id
-    await api.delete(`/api/blogs/${idToDelete}`)
+    const token = getToken()
+    await api
+        .delete(`/api/blogs/${idToDelete}`)
+        .auth(token, {type:'bearer'} ) 
 
     const newResponse = await api.get('/api/blogs')
     expect(newResponse.body).toHaveLength(helper.initialblogs.length - 1)
@@ -105,7 +122,12 @@ test('edit blog post', async () => {
         url:'http://notarealwebsite.com/',
         likes:3
     }
-    const returnedBlog = await api.put(`/api/blogs/${idToUpdate}`).send(newBlog)
+    const token = getToken()
+    const returnedBlog = await api
+        .put(`/api/blogs/${idToUpdate}`)
+        .send(newBlog)
+        .auth(token, {type:'bearer'} ) 
+
     expect(returnedBlog.body.id).toBe(idToUpdate)
     expect(returnedBlog.body.title).toBe('This is an Edited Blog')
     expect(returnedBlog.body.author).toBe('None other than yours truly')
