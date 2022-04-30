@@ -11,11 +11,16 @@ blogRouter.get('/', async (request, response) => {
 blogRouter.post('/', async (request, response) => {
     const {title, url, author, likes} = new Blog(request.body)
     const token = request.token
+    if (!token) {
+        console.log(token);
+        return response.status(401).json({ error: 'token missing or invalid' })
+    }
 
     const decodedToken = jwt.verify(token, process.env.SECRET)
-    if (!token || !decodedToken.id) {
+    if (!decodedToken.id) {
       return response.status(401).json({ error: 'token missing or invalid' })
     }
+
     const user = await User.findById(decodedToken.id)
 
     if (!title || !url) {
