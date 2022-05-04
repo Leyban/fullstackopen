@@ -88,7 +88,14 @@ const App = () => {
         await blogService.remove(id)
         setBlogs(blogs.filter(blog => blog.id !== id))
       } catch (error) {
-        console.log(error)
+        if(error.response.request.status === 401){
+          setErrorMessage(`Not authorized to delete blog ${title} by ${author}`)
+          setInterval(() => {
+            setErrorMessage(null)
+          }, 5000)
+        } else {
+          console.log(error)
+        }console.log(error)
       }
     }
   }
@@ -100,6 +107,7 @@ const App = () => {
       <div>
         username:
         <input
+          className='usernameInput'
           type="text"
           value={username}
           onChange={({ target }) => setUsername(target.value)}
@@ -108,6 +116,7 @@ const App = () => {
       <div>
         password:
         <input
+          className='passwordInput'
           type="password"
           value={password}
           onChange={({ target }) => setPassword(target.value)}

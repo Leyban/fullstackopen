@@ -7,6 +7,7 @@ const middleware = require('./utils/middleware')
 const blogRouter = require('./controller/blogRouter');
 const userRouter = require('./controller/userRouter');
 const loginRouter = require('./controller/loginRouter');
+const testRouter = require('./controller/testRouter')
 
 logger.info("connecting to ", config.MONGODB_URI) 
 
@@ -23,6 +24,13 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(middleware.requestLogger)
 app.use(middleware.tokenExtractor)
+
+
+// testing 
+if (process.env.NODE_ENV === 'test'){
+    app.use('/api/test', testRouter)
+}
+
 
 // routes
 app.use('/api/blogs', middleware.userExtractor, blogRouter)
