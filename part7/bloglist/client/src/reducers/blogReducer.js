@@ -82,3 +82,18 @@ export const deleteThisBlog = (blog) => {
     }
   }
 }
+
+export const commentBlog = (blog, comment) => {
+  return async (dispatch) => {
+    const blogComments = [...blog.comments]
+    blogComments.push(comment)
+    const commentedBlog = { ...blog, comments: blogComments }
+    try {
+      const returnedBlog = await blogService.comment(commentedBlog)
+      dispatch(updateBlog(returnedBlog))
+      dispatch(notify(`commented ${comment} on ${blog.title}`))
+    } catch (error) {
+      dispatch(errorAlert(error.message))
+    }
+  }
+}

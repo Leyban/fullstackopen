@@ -22,7 +22,8 @@ const App = () => {
   const user = useSelector((state) => state.user)
   const users = useSelector((state) => state.users)
   const blogs = useSelector((state) => state.blogs)
-  const match = useMatch('/users/:id')
+  const matchUser = useMatch('/users/:id')
+  const matchBlog = useMatch('/blogs/:id')
   const dispatch = useDispatch()
   const formRef = useRef()
 
@@ -45,16 +46,16 @@ const App = () => {
   }
 
   const returnUserDetails = () => {
-    const userDetailed = match
-      ? users.find((user) => user.id === match.params.id.slice(1))
+    const userDetailed = matchUser
+      ? users.find((user) => user.id === matchUser.params.id)
       : null
 
     return <User userDetailed={userDetailed} />
   }
 
   const returnBlogDetails = () => {
-    const blogDetailed = match
-      ? blogs.find((blog) => blog.id === match.params.id.slice(1))
+    const blogDetailed = matchBlog
+      ? blogs.find((blog) => blog.id === matchBlog.params.id)
       : null
 
     return <BlogDetails blog={blogDetailed} />
