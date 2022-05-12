@@ -1,0 +1,4 @@
+# Ignore artifacts:
+cypress
+public
+node_modules
