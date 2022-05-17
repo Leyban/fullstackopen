@@ -174,6 +174,7 @@ const resolvers = {
       return [];
     },
     allAuthors: async (root, args) => Author.find({}),
+    me: (root, args, { currentUser }) => currentUser,
   },
   Mutation: {
     addBook: async (root, args, { currentUser }) => {
