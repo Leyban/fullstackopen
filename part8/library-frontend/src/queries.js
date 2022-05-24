@@ -1,5 +1,20 @@
 import { gql } from '@apollo/client';
 
+const BOOK_DETAILS = gql`
+  fragment BookDetails on Book {
+    title
+    published
+    author {
+      bookCount
+      born
+      id
+      name
+    }
+    genres
+    id
+  }
+`;
+
 export const GET_AUTHORS = gql`
   query AllAuthors {
     allAuthors {
@@ -13,27 +28,21 @@ export const GET_AUTHORS = gql`
 export const GET_BOOKS = gql`
   query AllBooks {
     allBooks {
-      title
-      author {
-        name
-      }
-      published
-      genres
+      ...BookDetails
     }
   }
+
+  ${BOOK_DETAILS}
 `;
 
 export const GET_BOOKS_BY_GENRE = gql`
   query BooksByGenre($genre: String) {
     allBooks(genre: $genre) {
-      title
-      author {
-        name
-      }
-      published
-      genres
+      ...BookDetails
     }
   }
+
+  ${BOOK_DETAILS}
 `;
 
 export const CREATE_BOOK = gql`
@@ -70,3 +79,28 @@ export const LOGGED_USER = gql`
     }
   }
 `;
+
+export const BOOK_ADDED = gql`
+  subscription {
+    bookAdded {
+      ...BookDetails
+    }
+  }
+
+  ${BOOK_DETAILS}
+`;
+
+export const updateCache = (cache, query, addedBook) => {
+  const uniqByName = (a) => {
+    let seen = new Set();
+    return a.filter((item) => {
+      let k = item.title;
+      return seen.has(k) ? false : seen.add(k);
+    });
+  };
+  cache.updateQuery(query, ({ allBooks }) => {
+    return {
+      allBooks: uniqByName(allBooks.concat(addedBook)),
+    };
+  });
+};

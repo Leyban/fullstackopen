@@ -10,7 +10,6 @@ const Recommended = ({ show, token }) => {
   const filteredBooks = useQuery(GET_BOOKS_BY_GENRE, { variables: { genre: faveGenre } });
 
   useEffect(() => {
-    console.log(user.data, token);
     if (!user.data || !token) {
       return setShowRecommend(false);
     } else if (user.data.me === null && token) {
