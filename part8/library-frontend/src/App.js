@@ -57,15 +57,9 @@ const App = () => {
     setPage('books');
   };
 
-  const viewCache = () => {
-    console.log(client.cache);
-    console.log(client.cache.data.data.ROOT_QUERY);
-  };
-
   return (
     <div>
       <div>
-        <button onClick={() => viewCache()}>View Cache</button>
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
         {token ? (

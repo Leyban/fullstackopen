@@ -9,12 +9,12 @@ const SECRET = process.env.SECRET;
 
 // subscription
 const { PubSub } = require('graphql-subscriptions');
+const book = require('./models/book');
 const pubsub = new PubSub();
 
 const resolvers = {
   Author: {
-    bookCount: async ({ id }) => {
-      const booksByAuthor = await Book.find({ author: id });
+    bookCount: async ({ booksByAuthor }) => {
       return booksByAuthor.length;
     },
   },
@@ -83,6 +83,8 @@ const resolvers = {
         });
       }
 
+      savedAuthor.booksByAuthor = savedAuthor.booksByAuthor.concat(savedBook._id);
+      savedAuthor.save();
       pubsub.publish('BOOK_ADDED', { bookAdded: savedBook });
       return savedBook;
     },
