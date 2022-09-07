@@ -1,4 +1,4 @@
-const calculateBmi = (height: number, weight: number) => {
+export const calculateBmi = (height: number, weight: number) => {
   const bmi = (weight * 10000) / (height * height);
 
   switch (true) {
@@ -19,7 +19,7 @@ const calculateBmi = (height: number, weight: number) => {
     case bmi >= 40:
       return 'Obese (Class III)';
     default:
-      break;
+      return 'wat';
   }
 };
 

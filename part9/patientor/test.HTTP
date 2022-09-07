@@ -1,0 +1,16 @@
+GET http://localhost:3001/api/diagnoses
+
+###
+GET http://localhost:3001/api/patients
+
+###
+POST http://localhost:3001/api/patients
+Content-Type: application/json
+
+{
+    "name": "Eggward",
+    "ssn": "123123123",
+    "dateOfBirth": "12-2-2000",
+    "gender": "male",
+    "occupation": "headhunter"
+}

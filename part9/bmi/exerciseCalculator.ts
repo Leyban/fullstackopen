@@ -1,4 +1,4 @@
-interface ExerciseAnalysis {
+export interface ExerciseAnalysis {
   periodLength: number;
   trainingDays: number;
   success: boolean;
@@ -8,7 +8,7 @@ interface ExerciseAnalysis {
   average: number;
 }
 
-const calculateExercises = (traningHours: Array<number>, targetHours: number): ExerciseAnalysis => {
+export const calculateExercises = (traningHours: Array<number>, targetHours: number): ExerciseAnalysis => {
   const average = traningHours.reduce((accumulatedHours, hours) => accumulatedHours + hours, 0) / traningHours.length;
   const trainingDays = traningHours.filter((hours) => hours > 0).length;
   const success = average >= targetHours;
