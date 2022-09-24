@@ -41,6 +41,7 @@ const parseOccupation = (occupation: unknown): string => {
   return occupation;
 };
 
+// param is of type any because 'includes' method won't compile otherwise
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isGender = (param: any): param is Gender => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -55,7 +56,20 @@ const parseGender = (gender: unknown): Gender => {
   return gender;
 };
 
-type PatientFields = {
+// const isObject = (obj: unknown): obj is object => {
+//   const type = typeof obj;
+//   return type === 'function' || type === 'object' && !!obj;
+// }
+
+// const parseEntries = (entries: unknown): object => {
+//   if(!entries || !isObject(entries)){
+//     throw new Error('Incorrect or missing entries: '+ entries);
+//   }
+
+//   return entries;
+// };
+
+export type PatientFields = {
   name: unknown;
   ssn: unknown;
   dateOfBirth: unknown;
@@ -63,13 +77,20 @@ type PatientFields = {
   occupation: unknown;
 };
 
-const toNewPatient = ({ name, ssn, dateOfBirth, gender, occupation }: PatientFields): NewPatient => {
+const toNewPatient = ({
+  name,
+  ssn,
+  dateOfBirth,
+  gender,
+  occupation,
+}: PatientFields): NewPatient => {
   const newPatient = {
     name: parseName(name),
     ssn: parseSsn(ssn),
     dateOfBirth: parseDateOfBirth(dateOfBirth),
     gender: parseGender(gender),
     occupation: parseOccupation(occupation),
+    entries: [],
   };
 
   return newPatient;

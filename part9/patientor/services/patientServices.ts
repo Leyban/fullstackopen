@@ -1,8 +1,12 @@
 import patients from '../data/patients';
-import { NewPatient, Patient } from '../types';
+import { Entry, EntryTypes, NewEntry, NewPatient, Patient } from '../types';
 import { v1 as uuid } from 'uuid';
 
-const getPatients = (): Omit<Patient, 'ssn'>[] => {
+const assertNever = (value: never): never => {
+  throw new Error('Uncaught type' + value);
+};
+
+const getPatients = (): Omit<Patient, 'ssn' | 'entries'>[] => {
   return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
     id,
     name,
@@ -12,10 +16,14 @@ const getPatients = (): Omit<Patient, 'ssn'>[] => {
   }));
 };
 
+const getPatient = (id: string): Patient | undefined => {
+  return patients.find((p) => p.id === id);
+};
+
 const addPatient = (patientEntry: NewPatient): Patient => {
   const newPatient = {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     id: String(uuid()),
+    entries: [],
     ...patientEntry,
   };
 
@@ -23,7 +31,46 @@ const addPatient = (patientEntry: NewPatient): Patient => {
   return newPatient;
 };
 
+const addEntry = (patientId: string, entry: NewEntry): Patient | undefined => {
+  const createNewEntry = (): Entry => {
+    switch (entry.type) {
+      case EntryTypes.HealthCheck:
+        return {
+          ...entry,
+          id: String(uuid()),
+          type: EntryTypes.HealthCheck,
+        };
+      case EntryTypes.Hospital:
+        return {
+          ...entry,
+          id: String(uuid()),
+          type: EntryTypes.Hospital,
+        };
+      case EntryTypes.OccupationalHealthcare:
+        return {
+          ...entry,
+          id: String(uuid()),
+          type: EntryTypes.OccupationalHealthcare,
+        };
+      default:
+        return assertNever(entry);
+    }
+  };
+
+  const newEntry = createNewEntry();
+
+  patients.map((p) => {
+    if (p.id === patientId) {
+      p.entries.push(newEntry);
+    }
+  });
+
+  return patients.find((p) => p.id === patientId);
+};
+
 export default {
   getPatients,
+  getPatient,
   addPatient,
+  addEntry,
 };
